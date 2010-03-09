@@ -1,0 +1,26 @@
+These tools rescue JPEG files from broken SD/USB memory cards 
+
+* jpeg_rescue
+
+'jpeg_rescue' rescues JPEG files from broken SD/USB memory cards.
+This tool expects JPEG files are wrote sequentially in memory device.
+
+This tool searches JPEG Start Of Image (0xff 0xd8) from top of
+each cluster (4KB block) and pick up data (to just before next SOI).
+
+usage: 
+
+1. insert broekn SD/USB memory into slot of your PC.
+2. when your memory device appears in /dev/da0
+ # dd if=/dev/da0 of=hogehoge bs=1m
+ # jpeg_rescue hogehoge
+ or
+ # jpeg_rescue /dev/da0
+
+
+* jpeg_truncate
+'jpeg_truncate' truncates unnecessary end of data
+This tool trancate garbage after JPEG End Of Image (0xff 0xd9)
+
+usage:
+ % jpeg_truncate *.jpg
