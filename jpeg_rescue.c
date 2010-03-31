@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -6,7 +8,9 @@
 #define BLOCKSIZE 4096
 #define MAXJPEGSIZE (1024*1024*10)
 
-int is_jpeg_startofimage(unsigned char *buf)
+
+int
+is_jpeg_startofimage(unsigned char *buf)
 {
 	if(buf[0] == 0xff &&
 	   buf[1] == 0xd8){
@@ -17,20 +21,20 @@ int is_jpeg_startofimage(unsigned char *buf)
 }
 
 		
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
 	FILE *ifp;
 	char *ifname;
 	
 	FILE *ofp = NULL;
 	char ofname[8+1+3+1];
-	size_t oflen;
+	size_t oflen = 0;
 
 	unsigned char buf[MAXBUF];
 	int cl = 0;
-
 	int i = 0;
-	
+
 	if(argc != 2){
 		fprintf(stderr, "please specify filename\n");
 		return -1;
@@ -42,28 +46,27 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	while(!feof(ifp)){
+	for(cl = 0; !feof(ifp); cl++){
 		int err;
 
-		cl++;
 		if((err=fread(buf, BLOCKSIZE, 1, ifp))!=1){
-			fprintf(stderr, "fread: error=%d, skip cl=%ld\n", err, cl);
+			fprintf(stderr, "fread: error=%d, skip cl=%d\n", err, cl);
 			continue;
 		}
 		if(oflen > MAXJPEGSIZE){
-			fprintf(stderr, ", cut [%ld]\n", oflen);
+			fprintf(stderr, ", cut [%uz]\n", oflen);
 			fclose(ofp);
 			ofp = NULL;
 			oflen = 0;
 		}
 		if(is_jpeg_startofimage(buf)){
 			if(ofp!=NULL){
-				fprintf(stderr, ", done [%ld]\n", oflen);
+				fprintf(stderr, ", done [%uz]\n", oflen);
 				fclose(ofp);
 				ofp = NULL;
 				oflen = 0;
 			}
-			snprintf(ofname, sizeof(ofname), "%08ld.jpg", i++);
+			snprintf(ofname, sizeof(ofname), "%08d.jpg", i++);
 			fprintf(stderr, "writing: %s", ofname);
 			oflen = 0;
 			if((ofp = fopen(ofname, "w"))==NULL){
@@ -77,7 +80,7 @@ int main(int argc, char** argv)
 			continue;
 		}
 		if((err=fwrite(buf, BLOCKSIZE, 1, ofp))!=1){
-			fprintf(stderr, "fwrite: error=%d, skip cl=%ld\n", err, cl);
+			fprintf(stderr, "fwrite: error=%d, skip cl=%d\n", err, cl);
 			continue;
 		}
 		oflen += BLOCKSIZE;

@@ -1,5 +1,7 @@
 ALLTARGETS=jpeg_rescue jpeg_truncate
 
+CFLAGS+=-Wall
+
 all: $(ALLTARGETS)
 
 jpeg_rescue: jpeg_rescue.o
