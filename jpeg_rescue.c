@@ -5,7 +5,8 @@
 #include <sys/stat.h>
 
 #define MAXBUF 4096
-#define BLOCKSIZE 4096
+#define BLOCKSIZE1 512		/* 1st block size */
+#define BLOCKSIZE 4096		/* default block size */
 #define MAXJPEGSIZE (1024*1024*10)
 
 
@@ -46,6 +47,17 @@ main(int argc, char** argv)
 		return -1;
 	}
 
+	for(cl = 0; !feof(ifp); cl++){ /* search first JPEG's SOI (start of image) */
+		if(fread(buf, BLOCKSIZE1, 1, ifp)!=1){
+			continue;
+		}
+		if(is_jpeg_startofimage(buf)){ /* find first JPEG */
+			fseek(ifp, -BLOCKSIZE1, SEEK_CUR); /* rewind and break */
+			fprintf(stderr, "find first SOI at cl=%d\n", cl);
+			break;
+		}
+	}
+	
 	for(cl = 0; !feof(ifp); cl++){
 		int err;
 
