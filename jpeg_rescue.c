@@ -66,14 +66,14 @@ main(int argc, char** argv)
 			continue;
 		}
 		if(oflen > MAXJPEGSIZE){
-			fprintf(stderr, ", cut [%uz]\n", oflen);
+			fprintf(stderr, ", cut [%zu]\n", oflen);
 			fclose(ofp);
 			ofp = NULL;
 			oflen = 0;
 		}
 		if(is_jpeg_startofimage(buf)){
 			if(ofp!=NULL){
-				fprintf(stderr, ", done [%uz]\n", oflen);
+				fprintf(stderr, ", done [%zu]\n", oflen);
 				fclose(ofp);
 				ofp = NULL;
 				oflen = 0;
